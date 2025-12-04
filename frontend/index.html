@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Wrapped 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Your 2025 Wrapped</h1>
+            <p>A deep dive into your listening habits.</p>
+        </header>
+
+        <main id="app">
+            <section class="card highlight" id="total-time">
+                <h2>Total Time Listened</h2>
+                <div class="stat-value" id="total-hours">Loading...</div>
+                <div class="stat-label">Hours</div>
+            </section>
+
+            <section class="card" id="top-artist">
+                <h2>Top Artist</h2>
+                <div class="stat-value" id="top-artist-name">Loading...</div>
+                <div class="stat-sub" id="top-artist-hours"></div>
+            </section>
+
+            <section class="card" id="top-tracks">
+                <h2>Top 5 Tracks</h2>
+                <ul class="list" id="top-tracks-list">
+                    <!-- Items injected here -->
+                </ul>
+            </section>
+
+            <section class="card" id="top-podcasts">
+                <h2>Top 5 Podcasts</h2>
+                <ul class="list" id="top-podcasts-list">
+                    <!-- Items injected here -->
+                </ul>
+            </section>
+
+            <section class="card" id="active-hour">
+                <h2>Most Active Hour</h2>
+                <div class="stat-value" id="active-hour-val">Loading...</div>
+            </section>
+
+            <section class="card" id="listening-periods">
+                <h2>Listening Periods</h2>
+                <div class="chart-container" id="periods-chart">
+                    <!-- Simple bar chart visualization -->
+                </div>
+            </section>
+
+            <section class="card" id="top-days">
+                <h2>Top Days</h2>
+                <ul class="list" id="top-days-list"></ul>
+            </section>
+
+            <section class="grid-2">
+                <div class="card" id="most-played">
+                    <h2>Most Played Track</h2>
+                    <div class="stat-value small" id="most-played-name">Loading...</div>
+                    <div class="stat-sub" id="most-played-count"></div>
+                </div>
+                <div class="card" id="skips">
+                    <h2>Most Skipped</h2>
+                    <ul class="list small" id="skips-list"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
