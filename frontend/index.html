@@ -1,81 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Wrapped 2025</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <div class="container">
-        <header>
-            <h1>Your 2025 Wrapped</h1>
-            <p>A deep dive into your listening habits.</p>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <div class="grain"></div>
+
+    <main class="page">
+        <header class="hero reveal">
+            <p class="eyebrow">Spotify Wrapped 2025</p>
+            <h1 class="hero-title">Your Year, Mixed Loud.</h1>
+            <p class="hero-subtitle">
+                A story-driven breakdown of your listening behavior, powered by a precomputed summary cache.
+            </p>
+            <div class="hero-metrics">
+                <div class="metric-card spotlight">
+                    <p class="metric-label">Total Listening Time</p>
+                    <p class="metric-value" id="total-hours">--</p>
+                    <p class="metric-meta">hours</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-label">Top Artist</p>
+                    <p class="metric-value" id="top-artist-name">--</p>
+                    <p class="metric-meta" id="top-artist-hours">--</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-label">Most Active Hour</p>
+                    <p class="metric-value" id="active-hour-val">--</p>
+                    <p class="metric-meta" id="active-hour-minutes">--</p>
+                </div>
+            </div>
+            <p class="generated-at" id="generated-at">Awaiting summary cache...</p>
         </header>
 
-        <main id="app">
-            <section class="card highlight" id="total-time">
-                <h2>Total Time Listened</h2>
-                <div class="stat-value" id="total-hours">Loading...</div>
-                <div class="stat-label">Hours</div>
-            </section>
+        <section id="status-panel" class="status-panel loading reveal">
+            <p id="status-message">Loading wrapped data...</p>
+            <button id="retry-btn" type="button">Retry</button>
+        </section>
 
-            <section class="card" id="top-artist">
-                <h2>Top Artist</h2>
-                <div class="stat-value" id="top-artist-name">Loading...</div>
-                <div class="stat-sub" id="top-artist-hours"></div>
-            </section>
-
-            <section class="card" id="top-tracks">
-                <h2>Top 5 Tracks</h2>
-                <ul class="list" id="top-tracks-list">
-                    <!-- Items injected here -->
-                </ul>
-            </section>
-
-            <section class="card" id="top-podcasts">
-                <h2>Top 5 Podcasts</h2>
-                <ul class="list" id="top-podcasts-list">
-                    <!-- Items injected here -->
-                </ul>
-            </section>
-
-            <section class="card" id="active-hour">
-                <h2>Most Active Hour</h2>
-                <div class="stat-value" id="active-hour-val">Loading...</div>
-            </section>
-
-            <section class="card" id="listening-periods">
-                <h2>Listening Periods</h2>
-                <div class="chart-container" id="periods-chart">
-                    <!-- Simple bar chart visualization -->
+        <section class="grid-layout">
+            <article class="panel panel-wide reveal">
+                <div class="panel-head">
+                    <h2>Top Tracks</h2>
+                    <p>The songs that defined your year.</p>
                 </div>
-            </section>
+                <canvas id="top-tracks-chart" aria-label="Top tracks chart"></canvas>
+                <p id="top-tracks-empty" class="chart-empty"></p>
+            </article>
 
-            <section class="card" id="top-days">
-                <h2>Top Days</h2>
-                <ul class="list" id="top-days-list"></ul>
-            </section>
+            <article class="panel reveal">
+                <div class="panel-head">
+                    <h2>Top Podcasts</h2>
+                    <p>Your most played episodes.</p>
+                </div>
+                <ul id="top-podcasts-list" class="insight-list"></ul>
+            </article>
 
-            <section class="grid-2">
-                <div class="card" id="most-played">
+            <article class="panel reveal">
+                <div class="panel-head">
+                    <h2>Listening Periods</h2>
+                    <p>When your ears were most active.</p>
+                </div>
+                <canvas id="periods-chart" aria-label="Listening periods chart"></canvas>
+                <p id="periods-empty" class="chart-empty"></p>
+            </article>
+
+            <article class="panel reveal">
+                <div class="panel-head">
+                    <h2>Top Days</h2>
+                    <p>Your strongest listening days.</p>
+                </div>
+                <ul id="top-days-list" class="insight-list"></ul>
+            </article>
+
+            <article class="panel reveal">
+                <div class="panel-head">
                     <h2>Most Played Track</h2>
-                    <div class="stat-value small" id="most-played-name">Loading...</div>
-                    <div class="stat-sub" id="most-played-count"></div>
+                    <p>The repeat champion.</p>
                 </div>
-                <div class="card" id="skips">
-                    <h2>Most Skipped</h2>
-                    <ul class="list small" id="skips-list"></ul>
+                <p class="feature-track" id="most-played-name">--</p>
+                <p class="feature-meta" id="most-played-count">--</p>
+            </article>
+
+            <article class="panel reveal">
+                <div class="panel-head">
+                    <h2>Most Skipped Tracks</h2>
+                    <p>The tracks you bailed on quickly.</p>
                 </div>
-            </section>
-        </main>
-    </div>
+                <ul id="skips-list" class="insight-list compact"></ul>
+            </article>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="script.js"></script>
 </body>
-
 </html>

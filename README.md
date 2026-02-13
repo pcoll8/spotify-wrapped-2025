@@ -1,63 +1,114 @@
-# Spotify Wrapped 2025 Web App
+# Spotify Wrapped 2025 (V2)
 
-A local web application to analyze your Spotify streaming history for 2025.
+A local Spotify Wrapped web app with:
+- A cached summary API (`/api/v2/wrapped`) for fast frontend loading.
+- Batched loader ingestion for better data import performance.
+- A redesigned editorial frontend using one API request, Chart.js, and GSAP.
 
 ## Prerequisites
 
 - Python 3.8+
 - PostgreSQL
-- Your Spotify Data (Request from [Spotify Privacy](https://www.spotify.com/us/account/privacy/))
+- Spotify export JSON files (request from [Spotify Privacy](https://www.spotify.com/us/account/privacy/))
 
 ## Setup
 
-1.  **Install Dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-2.  **Database Setup**:
-    - Ensure PostgreSQL is running.
-    - Create a database (e.g., `spotify_wrapped`).
-    - Create a `.env` file in the `backend/` directory with your connection string:
-        ```
-        DATABASE_URL=postgresql://user:password@localhost:5432/spotify_wrapped
-        ```
-    - Run the schema script to create tables:
-        ```bash
-        psql -d spotify_wrapped -f schema.sql
-        ```
-        *(Or use any SQL client to execute the contents of `schema.sql`)*
+2. Configure database:
+   - Ensure PostgreSQL is running.
+   - Create a database (example: `spotify_wrapped`).
+   - Create `backend/.env`:
+     ```env
+     DATABASE_URL=postgresql://user:password@localhost:5432/spotify_wrapped
+     ```
 
-3.  **Load Data**:
-    - Place your Spotify JSON export files (e.g., `StreamingHistory0.json`, `endsong_0.json`) into the `data/` folder.
-    - Run the loader script:
-        ```bash
-        cd backend
-        python loader.py
-        ```
-    - This will load raw data and populate the `PRS.SPOTIFY_EVENTS_2025` table.
+3. Apply schema:
+   ```bash
+   psql -d spotify_wrapped -f schema.sql
+   ```
+   This creates:
+   - `RAW.SPOTIFY_EVENTS`
+   - `PRS.SPOTIFY_EVENTS_2025`
+   - `PRS.SPOTIFY_WRAPPED_2025_SUMMARY`
+   - Indexes and SQL refresh function: `PRS.refresh_spotify_wrapped_2025_summary(...)`
 
-4.  **Run the App**:
-    - Start the backend server:
-        ```bash
-        cd backend
-        uvicorn main:app --reload
-        ```
-    - Open your browser and go to: [http://localhost:8000/static/index.html](http://localhost:8000/static/index.html)
+4. Load data and build summary cache:
+   - Place Spotify JSON files in `data/`.
+   - Run:
+     ```bash
+     cd backend
+     python loader.py
+     ```
+   The loader will:
+   - Batch insert into `RAW.SPOTIFY_EVENTS`
+   - Rebuild `PRS.SPOTIFY_EVENTS_2025`
+   - Refresh `PRS.SPOTIFY_WRAPPED_2025_SUMMARY` for year 2025
 
-## Features
+5. Start API + frontend:
+   ```bash
+   cd backend
+   uvicorn main:app --reload
+   ```
+   Open: [http://localhost:8000/static/index.html](http://localhost:8000/static/index.html)
 
-- **Total Time**: See total hours listened in 2025.
-- **Top Artist**: Your #1 artist by listening time.
-- **Top Tracks**: Top 5 tracks by duration.
-- **Active Hour**: The hour of the day you listen the most.
-- **Listening Periods**: Breakdown by Morning, Afternoon, Evening, Night.
-- **Top Days**: Days with the most listening time.
-- **Most Played**: Track with the highest play count.
-- **Skips**: Tracks you skipped the most (played < 5s).
+## API
 
-## Tech Stack
+### V2 endpoint (primary)
 
-- **Backend**: FastAPI, Python, PostgreSQL
-- **Frontend**: Vanilla HTML/CSS/JS
-- **Design**: Custom Dark Mode
+`GET /api/v2/wrapped`
+
+Response shape:
+- `year`
+- `generated_at`
+- `total_time`
+- `top_artist`
+- `active_hour`
+- `top_tracks`
+- `top_podcasts`
+- `listening_periods`
+- `top_days`
+- `most_played`
+- `skips`
+
+### Legacy compatibility endpoints
+
+The existing `/api/stats/*` routes are still available and now read from the cached summary payload:
+- `/api/stats/total-time`
+- `/api/stats/top-artist`
+- `/api/stats/top-tracks`
+- `/api/stats/top-podcasts`
+- `/api/stats/active-hour`
+- `/api/stats/listening-periods`
+- `/api/stats/top-days`
+- `/api/stats/most-played`
+- `/api/stats/skips`
+
+## Manual summary refresh (optional)
+
+If needed, refresh summary cache directly in SQL:
+```sql
+SELECT PRS.refresh_spotify_wrapped_2025_summary(2025);
+```
+
+## Frontend notes
+
+- The UI is still static HTML/CSS/JS (no framework migration).
+- Chart rendering uses CDN Chart.js.
+- Motion uses CDN GSAP.
+- The page fetches only one endpoint on load: `/api/v2/wrapped`.
+
+## Tests
+
+- Run unit tests:
+  ```bash
+  python -m pytest -q
+  ```
+- Integration summary test requires `TEST_DATABASE_URL`:
+  ```bash
+  set TEST_DATABASE_URL=postgresql://user:password@localhost:5432/spotify_wrapped_test
+  python -m pytest -m integration -q
+  ```
